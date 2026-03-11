@@ -1,0 +1,32 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: expo1
+      id: expo1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: expo1
+        setup-command: ''
+        command: "./expobin.sh"
+        input: 2 1234 789
+        expected-output: '481'
+        comparison-method: contains
+        timeout: 15
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        EXPO1_RESULTS: "${{steps.expo1.outputs.result}}"
+      with:
+        runners: expo1
